@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import db, const, argparse, boto3, os, subprocess, shutil
-from os import path, mkdir, getenv
+from os import path, makedirs, getenv
 from util import envkey_exists
 
 parser = argparse.ArgumentParser(
@@ -46,7 +46,7 @@ def create_database_backup(tag):
     output_directory = path.join(const.get_ipo_directory_temp(), '%s' % tag)
     if path.exists(output_directory):
         shutil.rmtree(output_directory)
-    mkdir(output_directory)
+    makedirs(output_directory, exist_ok=True)
     print('[create_database_backup] Created directory %s' % output_directory)
     print('[create_database_backup] Connecting to server...')
     connection = const.get_mongo_client()

@@ -36,7 +36,7 @@ def get_ipo_directory_temp():
     if envkey_exists(env_ipo_directory_temp()):
         value = os.path.abspath(os.getenv(env_ipo_directory_temp()))
     if not os.path.exists(value):
-        os.mkdir(value)
+        os.makedirs(value, exist_ok=True)
     return value
 
         

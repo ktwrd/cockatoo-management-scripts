@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import db, const, argparse, boto3, os, subprocess, shutil
-from os import path, mkdir, getenv
+from os import path, makedirs, getenv
 from util import envkey_exists
 
 parser = argparse.ArgumentParser(
@@ -69,7 +69,7 @@ def decompress_backup(directory, file):
     print('[decomress_backup] Decompressing %s to %s' % (file, directory))
     if path.exists(directory):
         shutil.rmtree(directory)
-    mkdir(directory)
+    makedirs(directory, exist_ok=True)
     script = 'cd \'%s\'; zip -o \'%s\'' % (directory, file)
     proc = subprocess.run(script, shell=True, check=True, capture_output=True)
     if proc.returncode != 0:
