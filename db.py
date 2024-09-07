@@ -2,25 +2,6 @@ import bson, os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-def action():
-    db_backup_dir = os.path.join(os.getcwd(), 'backups')
-    conn_addr = os.environ.get('MONGO_CONNECTION', '')
-    db_name = os.environ.get('MONGO_DATABASE', '')
-    error_count = 0
-    if conn_addr is None or len(conn_addr) < 1:
-        print('Environment Variable MONGO_CONNECTION is required!')
-        error_count += 1
-    if db_name is None or len(db_name) < 1:
-        print('Environment Variable MONGO_DATABASE is required!')
-        error_count += 1
-    if error_count > 0:
-        print('One or more errors occoured.')
-        exit()
-        
-    conn = MongoClient(conn_addr)
-    collections = conn[db_name].list_collection_names()
-    dump(collections, conn, db_name, db_backup_dir)
-
 def dump(collections, conn, db_name, path):
     """
     MongoDB Dump
