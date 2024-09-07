@@ -1,4 +1,4 @@
-import os, subprocess, urllib
+import os, subprocess, urllib, json
 def envkey_exists(key):
     value = os.environ.get(key, '')
     return value is not None and len(value) > 0
@@ -6,6 +6,21 @@ def run_program(cmd):
     print('[run_program] %s' % cmd)
     output = subprocess.check_output(cmd, shell=True, text=True)
     return output
+
+def get_container_ip(container, network=None):
+    cmd = 'docker inspect %s' % container
+    stdout = run_program(cmd)
+    if not stdout.startswith('['):
+        raise RuntimeError('Assumed failure for command %s since stdout isn\'t an array' % cmd)
+    data = json.loads(stdout)
+    if len(data) < 1:
+        return None
+    if network is None:
+        keys = data[0]['NetworkSettings']['Networks'].keys()
+        if len(keys) < 1:
+            raise RuntimeError('No networks are associated with the container %s\n%s' % (container, stdout))
+        return data[0]['NetworkSettings']['Networks'][keys[0]]['IPAddress']
+    return data[0]['NetworkSettings']['Networks'][network]['IPAddress']
 
 def create_mongo_url(data):
     result = 'mongodb://'
