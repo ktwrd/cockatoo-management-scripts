@@ -22,6 +22,26 @@ def get_container_ip(container, network=None):
         return data[0]['NetworkSettings']['Networks'][keys[0]]['IPAddress']
     return data[0]['NetworkSettings']['Networks'][network]['IPAddress']
 
+def get_container_external_port(container_name, internal_port):
+    cmd = 'docker inspect %s' % container_name
+    stdout = run_program(cmd)
+    if not stdout.startswith('['):
+        raise RuntimeError('Assumed failure for command %s since stdout isn\'t an array' % cmd)
+    data = json.loads(stdout)
+    if len(data) < 1:
+        return None
+    port_info = data[0]['NetworkSettings']['Ports'].get(internal_port, None)
+    if port_info is None:
+        return None
+    if len(port_info) < 1:
+        return None
+    for x in port_info:
+        if x.get('HostIp', None) == '0.0.0.0':
+            v = x.get('HostPort', None)
+            if v is not None:
+                return v
+    return None
+
 def create_mongo_url(data):
     result = 'mongodb://'
     if 'username' or 'password' in data:
